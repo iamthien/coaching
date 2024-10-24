@@ -61,66 +61,75 @@ class TrainingSessionList extends StatelessWidget {
             var session = _controller.trainingSessions[index];
             return Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 15, vertical: 5.0),
+                  const EdgeInsets.symmetric(horizontal: 13.5, vertical: 4),
               child: Card(
                 color: const Color.fromARGB(255, 238, 232, 216),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(7),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${session.id} - ${session.storeName}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        session.address,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Wrap all elements except the image grid with Padding
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 13,
+                          vertical: 8), // Padding for the non-image content
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            session.company,
+                            '${session.id} - ${session.storeName}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            session.address,
                             style: const TextStyle(fontSize: 14),
                           ),
-                          Text(
-                            session.person,
-                            style: const TextStyle(fontSize: 14),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                session.company,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                              Text(
+                                session.person,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Ngày giờ',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              Text(
+                                '${session.date.day}.${session.date.month}.${session.date.year}, ${session.date.hour}:${session.date.minute.toString().padLeft(2, '0')}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Ngày giờ',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          Text(
-                            '${session.date.day}.${session.date.month}.${session.date.year}, ${session.date.hour}:${session.date.minute.toString().padLeft(2, '0')}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
+                    ),
+
+                    // Dynamic Image Display (no padding inheritance here)
+                    if (session.imageUrls.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(
+                            3), // Independent padding for image grid
+                        child: _buildImageGrid(session.imageUrls),
                       ),
-                      const SizedBox(height: 2),
-                      // Dynamic Image Display
-                      if (session.imageUrls.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: _buildImageGrid(session.imageUrls),
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             );
@@ -132,31 +141,35 @@ class TrainingSessionList extends StatelessWidget {
 
   Widget _buildImageGrid(List<String> imageUrls) {
     if (imageUrls.isEmpty) {
-      return SizedBox.shrink(); // Don't show anything if there are no images
+      return const SizedBox
+          .shrink(); // Don't show anything if there are no images
     }
 
     if (imageUrls.length == 1) {
+      // Case 1: Show 1 image in a full row
       return ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(5),
         child: Image.asset(
           imageUrls[0],
           fit: BoxFit.cover,
           width: double.infinity,
-          height: 200,
+          height: 160, // Full space for single image
         ),
       );
     } else if (imageUrls.length == 2) {
+      // Case 2: 2 images, equally split in the first row with more space between them
       return Row(
         children: imageUrls
             .take(2)
             .map((url) => Expanded(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.all(2.0), // 2px padding between images
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 2.0), // Increased horizontal padding
                     child: AspectRatio(
-                      aspectRatio: 1, // Square images
+                      aspectRatio:
+                          1.5, // Slightly reduced aspect ratio for more space
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(5),
                         child: Image.asset(
                           url,
                           fit: BoxFit.cover,
@@ -168,74 +181,217 @@ class TrainingSessionList extends StatelessWidget {
             .toList(),
       );
     } else if (imageUrls.length == 3) {
-      return Row(
-        children: imageUrls
-            .take(3)
-            .map((url) => Expanded(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.all(2.0), // 2px padding between images
-                    child: AspectRatio(
-                      aspectRatio: 1, // Square images
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          url,
-                          fit: BoxFit.cover,
+      // Case 3: First row 1 image, second row 2 images
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: AspectRatio(
+              aspectRatio: 343 / 140, // Full width for the first image
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: Image.asset(
+                  imageUrls[0],
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Row(
+            children: imageUrls
+                .skip(1)
+                .take(2)
+                .map((url) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: AspectRatio(
+                          aspectRatio:
+                              169.5 / 110, // Split two images in second row
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              url,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ))
-            .toList(),
+                    ))
+                .toList(),
+          ),
+        ],
       );
-    } else if (imageUrls.length >= 4) {
+    } else if (imageUrls.length == 4) {
+      // Case 4: Both rows with 2 images
       return Column(
         children: [
           Row(
-            children:
-                imageUrls.take(2).map((url) => _buildGridImage(url)).toList(),
+            children: imageUrls
+                .take(2)
+                .map((url) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: AspectRatio(
+                          aspectRatio: 169.5 / 140, // First row, 2 images split
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              url,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
           ),
           Row(
             children: imageUrls
                 .skip(2)
-                .take(1)
-                .map((url) => _buildGridImage(url))
+                .take(2)
+                .map((url) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: AspectRatio(
+                          aspectRatio:
+                              169.5 / 140, // Second row, 2 images split
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              url,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+        ],
+      );
+    } else if (imageUrls.length == 5) {
+      // Case 5: First row with 2 images, second row with 3 images
+      return Column(
+        children: [
+          Row(
+            children: imageUrls
+                .take(2)
+                .map((url) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: AspectRatio(
+                          aspectRatio: 169.5 / 140, // First row, 2 images
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              url,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+          Row(
+            children: imageUrls
+                .skip(2)
+                .take(3)
+                .map((url) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: AspectRatio(
+                          aspectRatio:
+                              111.67 / 110, // Second row, 3 images split
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              url,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+        ],
+      );
+    } else if (imageUrls.length > 5) {
+      // Case 6: First row with 2 images, second row with 3 images, last image with "+n" overlay
+      return Column(
+        children: [
+          Row(
+            children: imageUrls
+                .take(2)
+                .map((url) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: AspectRatio(
+                          aspectRatio: 169.5 / 140, // First row, 2 images
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              url,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+          Row(
+            children: imageUrls
+                .skip(2)
+                .take(2)
+                .map((url) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: AspectRatio(
+                          aspectRatio: 111.67 / 120, // Second row, 3 images
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              url,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ))
                 .toList()
               ..add(Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: AspectRatio(
-                    // Ensure that the Stack has constraints
-                    aspectRatio: 1, // Set aspect ratio to keep the image square
+                    aspectRatio: 111.67 / 110, // Third image with overlay
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(5),
                           child: Image.asset(
-                            imageUrls[3], // The last visible image
+                            imageUrls[4],
                             fit: BoxFit.cover,
                           ),
                         ),
-                        // Overlay the "+n" on the last image
-                        if (imageUrls.length > 4)
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '+${imageUrls.length - 4}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '+${imageUrls.length - 5}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
+                        ),
                       ],
                     ),
                   ),
@@ -246,7 +402,7 @@ class TrainingSessionList extends StatelessWidget {
       );
     }
 
-    return SizedBox.shrink(); // Fallback for 0 images or any other case
+    return const SizedBox.shrink(); // Fallback for unexpected cases
   }
 
   Widget _buildMoreImages(int count) {

@@ -1,3 +1,4 @@
+import 'package:coaching/bottom_sheet.dart';
 import 'package:coaching/training_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,7 +28,23 @@ class TrainingSessionList extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
-              // Handle filter action
+              Get.bottomSheet(
+                DraggableScrollableSheet(
+                  expand: false,
+                  initialChildSize: 0.5, // Start at 50% of screen height
+                  minChildSize: 0.3, // Minimum height (30% of screen height)
+                  maxChildSize: 1.0, // Maximum height (100% of screen height)
+                  builder: (context, scrollController) {
+                    return MyBtmSheet(scrollController: scrollController);
+                  },
+                ),
+                backgroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                isScrollControlled: true, // Allow full screen drag
+              );
             },
             color: Colors.black,
           ),

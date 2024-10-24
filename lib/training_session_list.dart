@@ -3,6 +3,28 @@ import 'package:coaching/training_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+class TrainingSession {
+  final String id;
+  final String storeName;
+  final String address;
+  final String company;
+  final String person;
+  final DateTime date;
+  final List<String> imageUrls;
+  final String? status; // Optional status field
+
+  TrainingSession({
+    required this.id,
+    required this.storeName,
+    required this.address,
+    required this.company,
+    required this.person,
+    required this.date,
+    required this.imageUrls,
+    this.status, // Optional field for status
+  });
+}
+
 class TrainingSessionList extends StatelessWidget {
   final TrainingController _controller = Get.put(TrainingController());
 
@@ -78,12 +100,35 @@ class TrainingSessionList extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '${session.id} - ${session.storeName}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${session.id} - ${session.storeName}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (session.status !=
+                                  null) // Show status only if it is not null
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red, // Badge color
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    session.status!,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -280,7 +325,7 @@ class TrainingSessionList extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: AspectRatio(
-                          aspectRatio: 169.5 / 140, // First row, 2 images
+                          aspectRatio: 169.5 / 140, // First row with 2 images
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(5),
                             child: Image.asset(
@@ -301,8 +346,7 @@ class TrainingSessionList extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: AspectRatio(
-                          aspectRatio:
-                              111.67 / 110, // Second row, 3 images split
+                          aspectRatio: 113 / 100, // Second row with 3 images
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(5),
                             child: Image.asset(
@@ -317,8 +361,8 @@ class TrainingSessionList extends StatelessWidget {
           ),
         ],
       );
-    } else if (imageUrls.length > 5) {
-      // Case 6: First row with 2 images, second row with 3 images, last image with "+n" overlay
+    } else {
+      // Case 6: Default to handling more than 5 images with a grid
       return Column(
         children: [
           Row(
@@ -344,12 +388,12 @@ class TrainingSessionList extends StatelessWidget {
           Row(
             children: imageUrls
                 .skip(2)
-                .take(2)
+                .take(3)
                 .map((url) => Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: AspectRatio(
-                          aspectRatio: 111.67 / 120, // Second row, 3 images
+                          aspectRatio: 113 / 100, // Second row, 3 images
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(5),
                             child: Image.asset(
@@ -360,86 +404,10 @@ class TrainingSessionList extends StatelessWidget {
                         ),
                       ),
                     ))
-                .toList()
-              ..add(Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: AspectRatio(
-                    aspectRatio: 111.67 / 110, // Third image with overlay
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image.asset(
-                            imageUrls[4],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '+${imageUrls.length - 5}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )),
+                .toList(),
           ),
         ],
       );
     }
-
-    return const SizedBox.shrink(); // Fallback for unexpected cases
-  }
-
-  Widget _buildMoreImages(int count) {
-    return Container(
-      height: 100, // Height for remaining images indicator
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.black54,
-      ),
-      child: Center(
-        child: Text(
-          '+$count',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGridImage(String url) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(2.0), // 2px padding between images
-        child: AspectRatio(
-          aspectRatio: 1, // Square images
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: Image.asset(
-              url,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

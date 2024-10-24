@@ -6,6 +6,7 @@ class TrainingSession {
   final String person;
   final DateTime date;
   final List<String> imageUrls;
+  final String? status; // Add optional status field
 
   TrainingSession({
     required this.id,
@@ -15,5 +16,6 @@ class TrainingSession {
     required this.person,
     required this.date,
     required this.imageUrls,
+    this.status, // Initialize status as an optional field
   });
 }

@@ -21,6 +21,7 @@ class TrainingController extends GetxController {
         person: 'Đào Duy Từ',
         date: DateTime(2023, 10, 5, 14, 0),
         imageUrls: [], // Example with multiple images
+        status: 'Vi phạm', // Optional status
       ),
       TrainingSession(
         id: '0000241017',
@@ -57,6 +58,7 @@ class TrainingController extends GetxController {
           'assets/images/image2.png',
           'assets/images/image3.jpg',
         ], // Example with multiple images
+        status: 'Vi phạm', // Optional status
       ),
       TrainingSession(
         id: '0000241016',

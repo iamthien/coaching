@@ -5,7 +5,7 @@ class TrainingSession {
   final String company;
   final String person;
   final DateTime date;
-  final List<String> imageUrls; // Updated to hold multiple images
+  final List<String> imageUrls;
 
   TrainingSession({
     required this.id,
@@ -14,6 +14,6 @@ class TrainingSession {
     required this.company,
     required this.person,
     required this.date,
-    required this.imageUrls, // Updated
+    required this.imageUrls,
   });
 }

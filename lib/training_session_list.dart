@@ -31,9 +31,9 @@ class TrainingSessionList extends StatelessWidget {
               Get.bottomSheet(
                 DraggableScrollableSheet(
                   expand: false,
-                  initialChildSize: 0.5, // Start at 50% of screen height
-                  minChildSize: 0.3, // Minimum height (30% of screen height)
-                  maxChildSize: 1.0, // Maximum height (100% of screen height)
+                  initialChildSize: 0.6,
+                  minChildSize: 0.3,
+                  maxChildSize: 1.0,
                   builder: (context, scrollController) {
                     return MyBtmSheet(scrollController: scrollController);
                   },
@@ -43,7 +43,7 @@ class TrainingSessionList extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                isScrollControlled: true, // Allow full screen drag
+                isScrollControlled: true,
               );
             },
             color: Colors.black,
@@ -67,68 +67,60 @@ class TrainingSessionList extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(7),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.all(8.0), // Padding only for text
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${session.id} - ${session.storeName}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        session.address,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${session.id} - ${session.storeName}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            session.address,
+                            session.company,
                             style: const TextStyle(fontSize: 14),
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                session.company,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              Text(
-                                session.person,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ],
+                          Text(
+                            session.person,
+                            style: const TextStyle(fontSize: 14),
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Ngày giờ',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              Text(
-                                '${session.date.day}.${session.date.month}.${session.date.year}, ${session.date.hour}:${session.date.minute.toString().padLeft(2, '0')}',
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                              height: 2), // 2px padding before the images
                         ],
                       ),
-                    ),
-                    // Dynamic Image Display - 3px padding applied here
-                    if (session.imageUrls.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(
-                            3.0), // 3px padding around the grid
-                        child: _buildImageGrid(session.imageUrls),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Ngày giờ',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            '${session.date.day}.${session.date.month}.${session.date.year}, ${session.date.hour}:${session.date.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
                       ),
-                  ],
+                      const SizedBox(height: 2),
+                      // Dynamic Image Display
+                      if (session.imageUrls.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: _buildImageGrid(session.imageUrls),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -139,6 +131,10 @@ class TrainingSessionList extends StatelessWidget {
   }
 
   Widget _buildImageGrid(List<String> imageUrls) {
+    if (imageUrls.isEmpty) {
+      return SizedBox.shrink(); // Don't show anything if there are no images
+    }
+
     if (imageUrls.length == 1) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(10),
@@ -152,6 +148,7 @@ class TrainingSessionList extends StatelessWidget {
     } else if (imageUrls.length == 2) {
       return Row(
         children: imageUrls
+            .take(2)
             .map((url) => Expanded(
                   child: Padding(
                     padding:
@@ -173,6 +170,7 @@ class TrainingSessionList extends StatelessWidget {
     } else if (imageUrls.length == 3) {
       return Row(
         children: imageUrls
+            .take(3)
             .map((url) => Expanded(
                   child: Padding(
                     padding:
@@ -191,7 +189,7 @@ class TrainingSessionList extends StatelessWidget {
                 ))
             .toList(),
       );
-    } else if (imageUrls.length == 4) {
+    } else if (imageUrls.length >= 4) {
       return Column(
         children: [
           Row(
@@ -201,47 +199,74 @@ class TrainingSessionList extends StatelessWidget {
           Row(
             children: imageUrls
                 .skip(2)
-                .take(2)
+                .take(1)
                 .map((url) => _buildGridImage(url))
-                .toList(),
-          ),
-        ],
-      );
-    } else if (imageUrls.length == 5) {
-      return Column(
-        children: [
-          Row(
-            children:
-                imageUrls.take(2).map((url) => _buildGridImage(url)).toList(),
-          ),
-          Row(
-            children: imageUrls
-                .skip(2)
-                .take(3)
-                .map((url) => _buildGridImage(url))
-                .toList(),
-          ),
-        ],
-      );
-    } else if (imageUrls.length == 6) {
-      return Column(
-        children: [
-          Row(
-            children:
-                imageUrls.take(3).map((url) => _buildGridImage(url)).toList(),
-          ),
-          Row(
-            children: imageUrls
-                .skip(3)
-                .take(3)
-                .map((url) => _buildGridImage(url))
-                .toList(),
+                .toList()
+              ..add(Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: AspectRatio(
+                    // Ensure that the Stack has constraints
+                    aspectRatio: 1, // Set aspect ratio to keep the image square
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            imageUrls[3], // The last visible image
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        // Overlay the "+n" on the last image
+                        if (imageUrls.length > 4)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '+${imageUrls.length - 4}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              )),
           ),
         ],
       );
     }
 
     return SizedBox.shrink(); // Fallback for 0 images or any other case
+  }
+
+  Widget _buildMoreImages(int count) {
+    return Container(
+      height: 100, // Height for remaining images indicator
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.black54,
+      ),
+      child: Center(
+        child: Text(
+          '+$count',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildGridImage(String url) {

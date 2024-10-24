@@ -197,7 +197,7 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
                   ),
                   child: const Text(
                     'Tìm kiếm',
-                    style: TextStyle(color: Colors.white), // Text color
+                    style: TextStyle(color: Colors.white), // Set text color
                   ),
                 ),
               ],

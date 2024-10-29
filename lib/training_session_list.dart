@@ -187,7 +187,7 @@ class TrainingSessionList extends StatelessWidget {
   Widget _buildImageGrid(List<String> imageUrls) {
     if (imageUrls.isEmpty) {
       return const SizedBox
-          .shrink(); // Don't show anything if there are no images
+          .shrink(); // Don't show anything if there are no imagess
     }
 
     if (imageUrls.length == 1) {

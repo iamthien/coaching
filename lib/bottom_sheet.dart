@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class MyBtmSheet extends StatefulWidget {
   final ScrollController scrollController;
@@ -12,6 +13,10 @@ class MyBtmSheet extends StatefulWidget {
 
 class _MyBtmSheetState extends State<MyBtmSheet> {
   TextEditingController dateController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
+  String? selectedNPP;
+  String? selectedUSM;
+  String? selectedCustomer;
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
@@ -22,8 +27,7 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
     );
     if (pickedDate != null) {
       setState(() {
-        dateController.text =
-            "${pickedDate.month}.${pickedDate.day}.${pickedDate.year}";
+        dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
       });
     }
   }
@@ -31,7 +35,7 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      controller: widget.scrollController, // Use scrollController for scrolling
+      controller: widget.scrollController,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         decoration: const BoxDecoration(
@@ -52,33 +56,30 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
                 ),
               ),
             ),
-            const Center(
-              child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // Space text and icon apart
-                children: [
-                  Text(
-                    'Lọc dữ liệu',
-                    style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const Icon(
-                    Icons.refresh_sharp,
-                    size: 25,
-                    color: Color.fromARGB(255, 255, 156, 7),
-                  )
-                ],
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text(
+                  'Lọc dữ liệu',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                Icon(
+                  Icons.refresh_sharp,
+                  size: 25,
+                  color: Color.fromARGB(255, 255, 156, 7),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
 
             // Search Field
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: searchController,
+              decoration: const InputDecoration(
                 labelText: 'Tìm kiếm',
                 hintText: 'Táo',
-                border: const OutlineInputBorder(),
-                suffixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(),
+                suffixIcon: Icon(Icons.search),
               ),
             ),
             const SizedBox(height: 20),
@@ -88,7 +89,8 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
               onTap: () {
                 _selectDate(context);
               },
-              child: TextField(
+              child: // Date Picker TextField
+                  TextField(
                 controller: dateController,
                 decoration: const InputDecoration(
                   labelText: 'Thời gian',
@@ -97,13 +99,16 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
                   suffixIcon: Icon(Icons.calendar_today),
                 ),
                 readOnly: true,
+                onTap: () {
+                  _selectDate(context);
+                },
               ),
             ),
             const SizedBox(height: 20),
 
             // NPP Dropdown
             DropdownButtonFormField<String>(
-              value: '200000092 - Kiều My',
+              value: selectedNPP,
               decoration: const InputDecoration(
                 labelText: 'NPP',
                 border: OutlineInputBorder(),
@@ -115,14 +120,16 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
                 );
               }).toList(),
               onChanged: (String? newValue) {
-                // Handle change here
+                setState(() {
+                  selectedNPP = newValue;
+                });
               },
             ),
             const SizedBox(height: 20),
 
             // USM Dropdown
             DropdownButtonFormField<String>(
-              value: 'Đào Duy Từ',
+              value: selectedUSM,
               decoration: const InputDecoration(
                 labelText: 'USM',
                 border: OutlineInputBorder(),
@@ -134,14 +141,16 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
                 );
               }).toList(),
               onChanged: (String? newValue) {
-                // Handle change here
+                setState(() {
+                  selectedUSM = newValue;
+                });
               },
             ),
             const SizedBox(height: 20),
 
             // Customer Name Dropdown
             DropdownButtonFormField<String>(
-              value: 'Chị Phượng',
+              value: selectedCustomer,
               decoration: const InputDecoration(
                 labelText: 'Tên khách hàng',
                 border: OutlineInputBorder(),
@@ -153,7 +162,9 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
                 );
               }).toList(),
               onChanged: (String? newValue) {
-                // Handle change here
+                setState(() {
+                  selectedCustomer = newValue;
+                });
               },
             ),
             const SizedBox(height: 20),
@@ -162,42 +173,38 @@ class _MyBtmSheetState extends State<MyBtmSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 'Đóng' Button with border
                 OutlinedButton(
                   onPressed: () {
-                    Get.back(); // Close the bottom sheet
+                    Get.back();
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12.0, horizontal: 24.0), // Button padding
-                    side: const BorderSide(color: Colors.grey), // Border color
+                        vertical: 12.0, horizontal: 24.0),
+                    side: const BorderSide(color: Colors.grey),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Rounded corners
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: const Text(
                     'Đóng',
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 0, 0, 0)), // Text color
+                    style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                   ),
                 ),
-
-                // 'Tìm kiếm' Button with filled background
                 ElevatedButton(
                   onPressed: () {
-                    // Add search action here
+                    // Add search action here, check validation as needed
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12.0, horizontal: 24.0), // Button padding
-                    backgroundColor: Colors.green, // Background color
+                        vertical: 12.0, horizontal: 24.0),
+                    backgroundColor: Colors.green,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Rounded corners
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: const Text(
                     'Tìm kiếm',
-                    style: TextStyle(color: Colors.white), // Set text color
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
